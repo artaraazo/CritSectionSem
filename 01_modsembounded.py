@@ -15,16 +15,19 @@ def task(common, tid, semaphore):
         print(f'{tid}−{i}: Non−critical Section')
         a += 1
         print(f'{tid}−{i}: End of non−critical Section')
-        semaphore.acquire() #Semaforo rojo
-        print(f'{tid}−{i}: Critical section') #la sección crítica es lo que hace el programa que en este caso es aumentar contador
-        v = common.value + 1
-        print(f'{tid}−{i}: Inside critical section')
-        common.value = v
-        print(f'{tid}−{i}: End of critical section')
-        semaphore.release()
+        try:
+            semaphore.acquire() #Semaforo rojo
+            print(f'{tid}−{i}: Critical section') #la sección crítica es lo que hace el programa que en este caso es aumentar contador
+            v = common.value + 1
+            print(f'{tid}−{i}: Inside critical section')
+            common.value = v
+            print(f'{tid}−{i}: End of critical section')
+        finally:
+            semaphore.release()
 def main():
     lp = []
     common = Value('i', 0) #variables compartidas las paso por argumento
+    semaphore = BoundedSemaphore(1)
     for tid in range(N):
         lp.append(Process(target=task, args=(common, tid, semaphore))) #creo una lista con los 8 procesos.
     print (f"Valor inicial del contador {common.value}")
@@ -35,5 +38,4 @@ def main():
     print (f"Valor final del contador {common.value}")
     print ("fin")
 if __name__ == "__main__":
-   semaphore = BoundedSemaphore(1)
    main()
